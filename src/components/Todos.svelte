@@ -1,14 +1,49 @@
-<script>
+  <script>
     export let todos = []
   
-    let totalTodos = todos.length
-    let completedTodos = todos.filter(todos => todos.completed).length
+    $: totalTodos = todos.length
+    $: completedTodos = todos.filter(todos => todos.completed).length
+    let newTodoName = ''
+    let newTodoId
+      $:{
+        if (todos.length == 0) {
+          newTodoId = 1
+        }
+        else{
+          newTodoId = todos[todos.length - 1].id + 1;
+        }
+      }
+
+    function addTodo() {
+      todos.push({ id: newTodoId, name: newTodoName, completed: false })
+      newTodoName = ''
+      todos=todos
+    }
+
+
+    function deleteTodo (todo){
+      todos = todos.filter(t => t.id != todo.id)
+    }
+
+    // let filter = 'all'
+    // const filterTodos = (filter, todos) =>
+    //   filter === 'active' ? todos.filter(t => !t.completed) :
+    //   filter === 'completed' ? todos.filter(t => t.completed) :
+    //   todos
+
   </script>
   
   <h1>Todo App</h1>
   
-  <input type="text">
-  <button>Add New Task</button>
+  <form on:submit|preventDefault={addTodo}>
+    <label for="newTodo">😎 Get work done!</label>
+    <input type="text" bind:value={newTodoName}>
+    <button type="submit">Add</button>
+  </form>
+  
+  <!-- <button on:click={() => filter = 'all'}>Show all Tasks</button>
+  <button on:click={() => filter = 'completed'}>Show Completed Tasks</button>
+  <button on:click={() => filter = 'remaining'}>Show Remaining Tasks</button> -->
   
   <h2>Remaining Tasks ({totalTodos - completedTodos})</h2>
   <ul>
@@ -16,6 +51,7 @@
       <li>
         <input type="checkbox" bind:checked={todo.completed}>
         {todo.name} (id: {todo.id})
+        <button on:click={() => deleteTodo(todo)}>Delete</button>
       </li>
   
     {:else}
@@ -31,6 +67,7 @@
       <li>
         <input type="checkbox" bind:checked={todo.completed}>
         {todo.name} (id: {todo.id})
+        <button on:click={() => deleteTodo(todo)}>Delete</button>
       </li>
   
     {:else}
